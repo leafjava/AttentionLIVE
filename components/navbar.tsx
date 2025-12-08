@@ -58,16 +58,15 @@ export const Navbar = () => {
     >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-2 hover:opacity-80 transition-opacity" href="/home">
-            <div className="w-24 h-24 rounded-lg flex items-center justify-center">
-              <Image src="/icon.png" alt="Cargo X CCN" width={96} height={96} className="rounded-lg" />
+          <NextLink className="flex justify-start items-center gap-2 hover:opacity-80 transition-opacity" href="/tasks">
+            <div className="w-8 h-8 rounded-lg bg-yellow-500 flex items-center justify-center">
+              <span className="text-black font-bold text-xl">A</span>
             </div>
-            {/* <div className="flex flex-col">
-              <p className="font-bold text-lg text-[#FFA500]">
-                Cargo X CCN
+            <div className="flex flex-col">
+              <p className="font-bold text-base">
+                Attention<span className="text-yellow-500">LIVE</span>
               </p>
-              <p className="text-xs text-gray-500 hidden sm:block">Commodity Credit Network</p>
-            </div> */}
+            </div>
           </NextLink>
         </NavbarBrand>
         <ul className="hidden lg:flex gap-1 justify-start ml-4">
@@ -125,7 +124,14 @@ export const Navbar = () => {
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
         <NavbarItem className="hidden md:flex">
-          <ConnectWallet />
+          <Button
+            as={NextLink}
+            href="/profile"
+            className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold"
+            size="sm"
+          >
+            连接钱包
+          </Button>
         </NavbarItem>
       </NavbarContent>
 

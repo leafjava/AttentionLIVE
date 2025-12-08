@@ -1,65 +1,48 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "PicWe CCN",
-  description: "Commodity Credit Network - Global Commodity Financing & Settlement Platform",
+  name: "Attention LIVE",
+  description: "Watch-to-Earn 直播激励平台 - 币安广场直播生态",
   navItems: [
     {
-      label: "Home", // 首页
-      href: "/home",
+      label: "任务大厅",
+      href: "/tasks",
     },
     {
-      label: "Products", // 商品管理
-      href: "/products",
+      label: "排行榜",
+      href: "/leaderboard",
     },
     {
-      label: "Financing", // 融资申请
-      href: "/financing",
+      label: "个人中心",
+      href: "/profile",
     },
     {
-      label: "Pools", // 融资池
-      href: "/pools",
+      label: "主播控制台",
+      href: "/streamer",
     },
   ],
   navMenuItems: [
     {
-      label: "Profile",
+      label: "任务大厅",
+      href: "/tasks",
+    },
+    {
+      label: "排行榜",
+      href: "/leaderboard",
+    },
+    {
+      label: "个人中心",
       href: "/profile",
     },
     {
-      label: "Dashboard",
-      href: "/dashboard",
-    },
-    {
-      label: "Projects",
-      href: "/projects",
-    },
-    {
-      label: "Team",
-      href: "/team",
-    },
-    {
-      label: "Calendar",
-      href: "/calendar",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Help & Feedback",
-      href: "/help-feedback",
-    },
-    {
-      label: "Logout",
-      href: "/logout",
+      label: "主播控制台",
+      href: "/streamer",
     },
   ],
   links: {
-    github: "https://github.com/leafjava/picwe",
-    twitter: "https://x.com/PicWeGlobal?t=Yzb-vFY7C0JApMzx0z42GQ&s=05",
-    docs: "https://heroui.com",
-    discord: "https://discord.gg/9b6yyZKmH4",
-    sponsor: "https://patreon.com/jrgarciadev",
+    github: "https://github.com/attention-live",
+    twitter: "https://twitter.com/attention_live",
+    docs: "https://docs.attention.live",
+    discord: "https://discord.gg/attention",
   },
 };

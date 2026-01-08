@@ -142,8 +142,8 @@ cast rpc evm_mine --rpc-url http://127.0.0.1:8545
 
 #### 步骤 9: 等待冷却期后提取质押
 ```bash
-# 快进 7 天
-cast rpc evm_increaseTime 604800 --rpc-url http://127.0.0.1:8545
+# 快进 10 秒（测试配置）
+cast rpc evm_increaseTime 10 --rpc-url http://127.0.0.1:8545
 cast rpc evm_mine --rpc-url http://127.0.0.1:8545
 ```
 

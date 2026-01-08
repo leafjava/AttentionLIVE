@@ -1,74 +1,340 @@
-# PicWe Commodity Credit Network (BSC Testnet)
+# AttentionLive - 区块链直播注意力经济平台
 
-End-to-end commodity financing demo with registry, receivable pool, and mock stablecoin. Frontend + three smart contracts illustrating warehouse financing lifecycle: asset registration, LP deposits, borrower drawdown, payer repayment, asset clearing, and LP withdrawal.
+<div align="center">
 
-## Repos
+**让注意力产生价值，让参与获得回报**
 
-- Frontend: https://github.com/leafjava/picwe  
-- Contracts: https://github.com/wblu214/cargox_contract
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Solidity](https://img.shields.io/badge/Solidity-0.8.23-blue)](https://soliditylang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![Foundry](https://img.shields.io/badge/Foundry-latest-red)](https://getfoundry.sh/)
 
-## Addresses (BSC Testnet, chainId 97)
+[English](#english) | [中文](#chinese)
 
-- MockUSDT: `0xE707FEE53BfDd6C69Fc8D05caF148a6C28Edf49b`
-- CommodityAssetRegistry: `0x8dB7E0ed381a43de2b7c46585529e9bA0063eAA1`
-- ReceivablePool: `0x9F213109d2E9ADEA09e247AFC56bB2A03214C4E7`
-  - BscScan: [MockUSDT](https://testnet.bscscan.com/address/0xE707FEE53BfDd6C69Fc8D05caF148a6C28Edf49b) · [Registry](https://testnet.bscscan.com/address/0x8dB7E0ed381a43de2b7c46585529e9bA0063eAA1) · [ReceivablePool](https://testnet.bscscan.com/address/0x9F213109d2E9ADEA09e247AFC56bB2A03214C4E7)
+</div>
 
-## Core Flow (matches contract enums)
+---
 
-1) **Register Asset**  
-   `Pool.registerAsset(issuer, name, metadataURI, quantity, unit, referenceValue, status=Registered/0)` → `assetId`.
-2) **Set InTransit**  
-   `Pool.updateAssetStatus(assetId, InTransit=1)`.
-3) **Create Financing Deal**  
-   `Pool.createFinancingDeal(assetId, borrower, payer, interestRateBps, tenorDays)` → `dealId` (asset must be InTransit; borrower/payer ≠ 0).
-4) **LP Deposit**  
-   MockUSDT `approve(Pool, amount)` → `Pool.deposit(assetId, amount)`.
-5) **Borrower Drawdown**  
-   `Pool.drawdown(dealId, amount)` (caller = borrower) when liquidity is sufficient.
-6) **Payer Repay**  
-   MockUSDT `approve(Pool, payoffAmount(dealId))` → `Pool.repay(dealId)` (caller = payer).
-7) **Clear Asset**  
-   `Pool.updateAssetStatus(assetId, Cleared/3)`.
-8) **LP Withdraw**  
-   `Pool.withdraw(assetId)`.
+## 🎯 项目简介
 
-AssetStatus enum: `0 Registered`, `1 InTransit`, `2 Collateralized`, `3 Cleared`.
+AttentionLive 是一个基于区块链的去中心化直播平台，通过智能合约实现观众注意力的价值化和可交易化。
 
-## Frontend Pages (./app/(with-nav))
+### 核心价值
 
-- **Products**: Registry asset list, register via Pool, status update, live on-chain table.
-- **Financing**: Select asset → create deal → drawdown/repay (with deal inspector showing `deals(dealId)` + `payoffAmount`), demo-friendly hints.
-- **Pools**: LP mint/approve MockUSDT, deposit/withdraw, status update, liquidity stats; all calls use real contracts.
+- 🔐 **透明公平**：所有奖励分配通过智能合约自动执行，公开透明
+- 💰 **双向激励**：主播和观众都能获得公平回报
+- 🌐 **去中心化**：无平台抽成，仅 5% 协议费
+- 🔗 **多链支持**：支持 Ethereum、BSC 等多条 EVM 链
+- 📱 **易于使用**：友好的用户界面，详细的中文文档
 
-## Getting Started
+### 解决的问题
 
-1) Install deps: `npm install`  
-2) Run dev: `npm run dev`  
-3) Ensure env has WalletConnect project ID if needed: `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=...`  
-Wagmi is preconfigured for BSC testnet; addresses come from `lib/contracts.ts`.
+传统直播平台存在以下痛点：
+- 观众参与度无法量化和变现
+- 平台抽成过高（30-50%）
+- 虚假流量泛滥
+- 缺乏透明的激励机制
 
-## Contracts Overview
+AttentionLive 通过区块链技术，让观众的每一分钟观看、每一次互动都能转化为可量化的价值。
 
-- **MockUSDT**: 6-decimals ERC20 with mint/approve/transfer.
-- **CommodityAssetRegistry**: Asset storage with issuer/referenceValue/status.
-- **ReceivablePool**: Owns Registry; manages deals, LP liquidity, drawdown/repay, status updates, and views (`availableLiquidity`, `poolTotalDeposits`, `reservedInterest`, `payoffAmount`).
+---
 
-## Demo Tips
+## 🚀 快速开始
 
-- Use the latest addresses above; set assets to InTransit before creating deals.
-- LP must approve+deposit before borrower drawdown.
-- Payer must approve payoffAmount before repay.
-- Deal inspector (Financing page) helps verify dealId/borrower/payer/drawnAmount/payoffAmount.
+### 前置要求
 
-## Screenshots (app/test)
+- Node.js 18+
+- pnpm / npm
+- MetaMask 浏览器扩展
 
-<p align="center">
-  <img src="app/test/image.png" width="320" />
-  <img src="app/test/image (1).png" width="320" />
-  <img src="app/test/image (2).png" width="320" />
-</p>
-<p align="center">
-  <img src="app/test/image (3).png" width="320" />
-  <img src="app/test/image (4).png" width="320" />
-</p>
+### 安装
+
+```bash
+# 克隆仓库
+git clone [仓库地址]
+cd AttentionLive
+
+# 安装依赖
+pnpm install
+
+# 启动开发服务器
+pnpm dev
+```
+
+访问 http://localhost:3000
+
+### 连接钱包
+
+1. 安装 MetaMask
+2. 切换到 Sepolia 测试网
+3. 点击"连接钱包"
+4. 开始使用
+
+---
+
+## 📖 核心功能
+
+### 主播端
+
+1. **创建质押任务**
+   - 质押 ATT 代币
+   - 设置直播时长和奖励率
+   - 系统自动记录观众数据
+
+2. **领取奖励**
+   - 直播结束后自动计算奖励
+   - 基于观众参与度分配
+   - 最高可获得质押金额 50% 的奖励
+
+3. **取回质押**
+   - 领取奖励后等待冷却期
+   - 取回全部质押代币
+
+### 观众端
+
+1. **观看直播**
+   - 自动记录观看时长
+   - 互动行为获得额外积分
+
+2. **兑换奖励**
+   - 1000 积分 = 1 ATT
+   - 积分可随时兑换成代币
+   - 代币可自由交易
+
+---
+
+## 🏗️ 技术架构
+
+### 前端技术栈
+
+- **框架**: Next.js 14 (App Router)
+- **UI 库**: HeroUI (NextUI) + Tailwind CSS
+- **Web3**: Wagmi v2 + Viem
+- **语言**: TypeScript
+
+### 智能合约
+
+- **开发框架**: Foundry
+- **语言**: Solidity 0.8.23
+- **标准库**: OpenZeppelin Contracts
+
+### 核心合约
+
+1. **AttentionToken (ATT)**
+   - ERC20 标准代币
+   - 总供应量：100,000,000 ATT
+   - 支持铸造和销毁
+
+2. **StreamerStakingPool**
+   - 主播质押管理
+   - 奖励计算和分配
+   - 冷却期管理
+
+3. **ViewerRewardPool**
+   - 观众积分管理
+   - 积分兑换代币
+   - 兑换冷却期
+
+---
+
+## 📊 部署信息
+
+### Sepolia 测试网
+
+- **ATT Token**: [`0xdad467714C3f47A80463f6CfcAc16739dDa0883b`](https://sepolia.etherscan.io/address/0xdad467714C3f47A80463f6CfcAc16739dDa0883b)
+- **Staking Pool**: [`0x3ee9A32c2f6e6C856Ffa070c2963C2Ac7e559023`](https://sepolia.etherscan.io/address/0x3ee9A32c2f6e6C856Ffa070c2963C2Ac7e559023)
+- **Reward Pool**: [`0xbd4809912624f5D5571eeB11d1a8F699C06A5f83`](https://sepolia.etherscan.io/address/0xbd4809912624f5D5571eeB11d1a8F699C06A5f83)
+
+所有合约已在 Etherscan 上验证 ✅
+
+---
+
+## 💡 使用示例
+
+### 主播创建任务
+
+```typescript
+// 1. Approve ATT
+await approveToken(stakeAmount);
+
+// 2. Create Task
+await createTask({
+  stakeAmount: "5000",  // 5000 ATT
+  duration: "7200",     // 2 小时
+  rewardRate: "500"     // 5%
+});
+```
+
+### 观众兑换积分
+
+```typescript
+// 查看积分
+const points = await getViewerPoints(address);
+
+// 兑换代币
+if (points >= 1000) {
+  await claimReward();
+}
+```
+
+---
+
+## 📁 项目结构
+
+```
+AttentionLive/
+├── app/                    # Next.js 页面
+│   ├── (with-nav)/        # 带导航栏的页面
+│   │   └── staking/       # 质押页面
+│   └── layout.tsx         # 根布局
+├── components/            # React 组件
+│   ├── ConnectWallet.tsx  # 钱包连接
+│   └── navbar.tsx         # 导航栏
+├── config/                # 配置文件
+│   └── wagmi.ts          # Wagmi 配置
+├── lib/                   # 工具库
+│   ├── contracts/        # 合约地址和配置
+│   └── abi/              # 合约 ABI
+├── public/                # 静态资源
+└── styles/                # 样式文件
+```
+
+---
+
+## 🧪 测试
+
+### 完整流程测试
+
+1. 连接 MetaMask（Sepolia 网络）
+2. 获取测试 ATT 代币
+3. 创建质押任务（10 秒测试配置）
+4. 等待任务结束
+5. 领取奖励
+6. 取回质押
+
+详细测试指南：[FRONTEND_TESTING.md](FRONTEND_TESTING.md)
+
+---
+
+## 📚 文档
+
+- [项目基本信息](project_info.md) - 团队和项目信息
+- [详细项目文档](project_documentation.md) - 技术架构和实现
+- [用户场景说明](user_scenario.md) - 使用场景和可用性
+- [质押使用指南](STAKING_GUIDE.md) - 主播和观众使用指南
+- [前端测试指南](FRONTEND_TESTING.md) - 完整测试流程
+- [钱包连接说明](WALLET_CONNECTION_FIX.md) - 钱包配置
+
+---
+
+## 🤝 贡献指南
+
+我们欢迎所有形式的贡献！
+
+### 如何贡献
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
+
+### 代码规范
+
+- 使用 TypeScript 进行类型检查
+- 遵循 ESLint 规则
+- 添加必要的注释
+- 编写单元测试
+
+---
+
+## 📄 开源协议
+
+本项目采用 [MIT License](LICENSE)
+
+### 许可说明
+
+- ✅ 商业使用
+- ✅ 修改
+- ✅ 分发
+- ✅ 私人使用
+- ⚠️ 需保留版权声明
+
+---
+
+## 🗺️ 路线图
+
+### Q1 2026
+- ✅ 核心功能开发完成
+- ✅ Sepolia 测试网部署
+- ⏳ 完善文档和测试
+
+### Q2 2026
+- 🎯 主网部署
+- 🎯 后端数据采集服务
+- 🎯 移动端应用
+
+### Q3 2026
+- 🎯 NFT 徽章系统
+- 🎯 DAO 治理机制
+- 🎯 跨链支持
+
+### Q4 2026
+- 🎯 与主流平台集成
+- 🎯 生态系统建设
+- 🎯 社区治理启动
+
+---
+
+## 📞 联系方式
+
+- **GitHub**: [仓库链接]
+- **Issues**: [问题反馈]
+- **邮箱**: [团队邮箱]
+- **Discord**: [社区链接]
+
+---
+
+## 🙏 致谢
+
+感谢以下开源项目和社区：
+
+- [OpenZeppelin](https://openzeppelin.com/) - 智能合约安全库
+- [Foundry](https://getfoundry.sh/) - 智能合约开发工具
+- [Wagmi](https://wagmi.sh/) - React Hooks for Ethereum
+- [Next.js](https://nextjs.org/) - React 框架
+- [HeroUI](https://heroui.com/) - UI 组件库
+- 上海开源信息技术协会 - 提供比赛平台
+
+---
+
+## ⚠️ 免责声明
+
+本项目仅用于学习和研究目的。使用本项目时请注意：
+
+1. 智能合约已经过测试，但未经专业审计
+2. 请勿在主网上使用大额资金
+3. 使用本项目造成的任何损失，开发团队不承担责任
+4. 请遵守当地法律法规
+
+---
+
+## 📈 项目状态
+
+- ✅ 智能合约开发完成
+- ✅ 前端应用开发完成
+- ✅ Sepolia 测试网部署
+- ✅ 合约验证完成
+- ✅ 文档编写完成
+- ⏳ 后端服务开发中
+- ⏳ 主网部署准备中
+
+---
+
+<div align="center">
+
+**让注意力产生价值，让参与获得回报！** 🚀
+
+Made with ❤️ by AttentionLive Team
+
+</div>

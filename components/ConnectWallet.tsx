@@ -46,6 +46,7 @@ export default function ConnectWallet() {
 
   const handleConnect = async () => {
     console.log('🔗 开始钱包连接');
+    console.log('📋 可用连接器:', connectors);
     
     if (typeof window !== 'undefined' && !window.ethereum) {
       alert('未检测到 MetaMask 或 OKX 钱包');
@@ -53,43 +54,32 @@ export default function ConnectWallet() {
     }
     
     try {
-      // 检查并切换到 Sepolia 网络
+      // 获取当前链 ID（用于调试）
       const chainId = await window.ethereum.request({ method: 'eth_chainId' });
       const currentChainId = parseInt(chainId, 16);
+      console.log('🔗 当前链 ID:', currentChainId, '(31337=localhost, 97=BSC Testnet)');
       
-      if (currentChainId !== 11155111) {
-        console.log('⚠️ 切换到 Sepolia 测试网...');
-        try {
-          await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: '0xaa36a7' }],
-          });
-        } catch (switchError: any) {
-          if (switchError.code === 4902) {
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [{
-                chainId: '0xaa36a7',
-                chainName: 'Sepolia Testnet',
-                nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-                rpcUrls: ['https://sepolia.infura.io/v3/62c0ac4c3b2e4a809869158eeec667e8'],
-                blockExplorerUrls: ['https://sepolia.etherscan.io']
-              }]
-            });
-          }
-        }
-      }
+      // 本地测试：直接连接，不切换网络
+      // 生产环境：可以根据需要添加网络切换逻辑
       
       // 连接钱包
+      console.log('🔌 尝试连接钱包...');
       const injectedConnector = connectors.find(c => c.type === 'injected' || c.id === 'injected');
+      console.log('🔍 找到的连接器:', injectedConnector);
+      
       if (injectedConnector) {
+        console.log('✅ 使用 injected 连接器');
         connect({ connector: injectedConnector });
       } else if (connectors.length > 0) {
+        console.log('✅ 使用第一个可用连接器:', connectors[0]);
         connect({ connector: connectors[0] });
+      } else {
+        console.error('❌ 没有可用的连接器');
+        alert('没有可用的钱包连接器');
       }
     } catch (err: any) {
-      console.error('连接失败:', err);
-      if (err.code !== 4001) {
+      console.error('❌ 连接失败:', err);
+      if (err.code !== 4001) { // 4001 = 用户拒绝
         alert('连接失败: ' + err.message);
       }
     }

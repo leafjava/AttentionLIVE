@@ -124,14 +124,7 @@ export const Navbar = () => {
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
         <NavbarItem className="hidden md:flex">
-          <Button
-            as={NextLink}
-            href="/profile"
-            className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold"
-            size="sm"
-          >
-            连接钱包
-          </Button>
+          <ConnectWallet />
         </NavbarItem>
       </NavbarContent>
 

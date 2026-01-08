@@ -7,7 +7,7 @@ export const VIEWER_REWARD_POOL_ADDRESS = "0x9fE46736679d2D9a65F0992F2272dE9f3c7
 // Contract configuration
 export const STAKING_CONFIG = {
   minStakeAmount: "1000", // 1000 ATT
-  unstakeCooldown: 7 * 24 * 60 * 60, // 7 days in seconds
+  unstakeCooldown: 10, // 10 seconds (for testing)
   platformFeeRate: 500, // 5% = 500 basis points
   pointsPerToken: 1000, // 1000 points = 1 ATT
   minClaimPoints: 1000, // Minimum 1000 points to claim

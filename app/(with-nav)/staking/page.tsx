@@ -34,7 +34,10 @@ function TaskCard({
   onUnstake,
   isEnding,
   isClaiming,
-  isUnstaking
+  isUnstaking,
+  endTaskSuccess,
+  claimSuccess,
+  unstakeSuccess
 }: { 
   taskId: number;
   onEndTask: (id: number) => void;
@@ -43,13 +46,23 @@ function TaskCard({
   isEnding: boolean;
   isClaiming: boolean;
   isUnstaking: boolean;
+  endTaskSuccess: boolean;
+  claimSuccess: boolean;
+  unstakeSuccess: boolean;
 }) {
-  const { data: task } = useReadContract({
+  const { data: task, refetch: refetchTask } = useReadContract({
     address: STREAMER_STAKING_POOL_ADDRESS,
     abi: StreamerStakingPoolABI,
     functionName: 'tasks',
     args: [BigInt(taskId)],
   });
+
+  // Auto-refresh when transactions succeed
+  useEffect(() => {
+    if (endTaskSuccess || claimSuccess || unstakeSuccess) {
+      refetchTask();
+    }
+  }, [endTaskSuccess, claimSuccess, unstakeSuccess, refetchTask]);
 
   if (!task || !Array.isArray(task)) {
     return (
@@ -185,7 +198,7 @@ export default function StakingPage() {
 
   // Streamer staking state
   const [stakeAmount, setStakeAmount] = useState('');
-  const [duration, setDuration] = useState('3600'); // 1 hour default
+  const [duration, setDuration] = useState('10'); // 10 seconds default for testing
   const [rewardRate, setRewardRate] = useState('500'); // 5% default
 
   // Read streamer's task IDs
@@ -231,9 +244,9 @@ export default function StakingPage() {
   // Wait for transactions
   const { isLoading: isApproving, isSuccess: approveSuccess } = useWaitForTransactionReceipt({ hash: approveHash });
   const { isLoading: isCreating, isSuccess: createSuccess } = useWaitForTransactionReceipt({ hash: createTaskHash });
-  const { isLoading: isEnding } = useWaitForTransactionReceipt({ hash: endTaskHash });
-  const { isLoading: isClaimingStreamer } = useWaitForTransactionReceipt({ hash: claimStreamerHash });
-  const { isLoading: isUnstaking } = useWaitForTransactionReceipt({ hash: unstakeHash });
+  const { isLoading: isEnding, isSuccess: endTaskSuccess } = useWaitForTransactionReceipt({ hash: endTaskHash });
+  const { isLoading: isClaimingStreamer, isSuccess: claimStreamerSuccess } = useWaitForTransactionReceipt({ hash: claimStreamerHash });
+  const { isLoading: isUnstaking, isSuccess: unstakeSuccess } = useWaitForTransactionReceipt({ hash: unstakeHash });
   const { isLoading: isClaiming } = useWaitForTransactionReceipt({ hash: claimHash });
 
   // Refetch task list when task is created
@@ -360,6 +373,9 @@ export default function StakingPage() {
                     isEnding={isEnding}
                     isClaiming={isClaimingStreamer}
                     isUnstaking={isUnstaking}
+                    endTaskSuccess={endTaskSuccess}
+                    claimSuccess={claimStreamerSuccess}
+                    unstakeSuccess={unstakeSuccess}
                   />
                 ))}
               </CardBody>
@@ -385,11 +401,11 @@ export default function StakingPage() {
               <div>
                 <Input
                   label="Duration (seconds)"
-                  placeholder="3600"
+                  placeholder="10"
                   value={duration}
                   onChange={(e) => setDuration(e.target.value)}
                   type="number"
-                  description="Minimum: 300 (5 minutes), Maximum: 86400 (24 hours)"
+                  description="Minimum: 10 seconds, Maximum: 86400 (24 hours)"
                 />
               </div>
 
@@ -411,7 +427,7 @@ export default function StakingPage() {
                   <li>Earn rewards based on viewer engagement</li>
                   <li>Higher viewer count = higher rewards</li>
                   <li>Platform fee: {STAKING_CONFIG.platformFeeRate / 100}%</li>
-                  <li>Unstake cooldown: {STAKING_CONFIG.unstakeCooldown / 86400} days</li>
+                  <li>Unstake cooldown: {STAKING_CONFIG.unstakeCooldown} seconds (for testing)</li>
                 </ul>
               </div>
 

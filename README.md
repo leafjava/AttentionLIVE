@@ -9,6 +9,8 @@
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
 [![Foundry](https://img.shields.io/badge/Foundry-latest-red)](https://getfoundry.sh/)
 
+🌐 **在线演示**: [https://attention-live-7qja.vercel.app](https://attention-live-7qja.vercel.app)
+
 [English](#english) | [中文](#chinese)
 
 </div>
@@ -41,13 +43,24 @@ AttentionLive 通过区块链技术，让观众的每一分钟观看、每一次
 
 ## 🚀 快速开始
 
-### 前置要求
+### 在线体验
+
+直接访问：**https://attention-live-7qja.vercel.app**
+
+无需安装，只需：
+1. 安装 MetaMask 钱包
+2. 切换到 Sepolia 测试网
+3. 连接钱包即可开始使用
+
+### 本地开发
+
+#### 前置要求
 
 - Node.js 18+
 - pnpm / npm
 - MetaMask 浏览器扩展
 
-### 安装
+#### 安装
 
 ```bash
 # 克隆仓库

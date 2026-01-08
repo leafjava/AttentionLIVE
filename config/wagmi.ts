@@ -1,5 +1,5 @@
 import { http, createConfig } from 'wagmi';
-import { bscTestnet } from 'wagmi/chains';
+import { bscTestnet, localhost } from 'wagmi/chains';
 import { injected } from 'wagmi/connectors';
 
 // 硬编码 RPC / WalletConnect 项目 ID（按要求写死在代码中）
@@ -13,10 +13,12 @@ const connectors = [
   }),
 ];
 
+// 支持本地开发和 BSC 测试网
 export const wagmiConfig = createConfig({
-  chains: [bscTestnet],
+  chains: [localhost, bscTestnet],
   connectors,
   transports: {
+    [localhost.id]: http('http://127.0.0.1:8545'),
     [bscTestnet.id]: http(RPC_URL),
   },
   ssr: true,

@@ -9,6 +9,10 @@ export const siteConfig = {
       href: "/tasks",
     },
     {
+      label: "质押",
+      href: "/staking",
+    },
+    {
       label: "排行榜",
       href: "/leaderboard",
     },
@@ -25,6 +29,10 @@ export const siteConfig = {
     {
       label: "任务大厅",
       href: "/tasks",
+    },
+    {
+      label: "质押",
+      href: "/staking",
     },
     {
       label: "排行榜",

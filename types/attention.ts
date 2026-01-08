@@ -50,3 +50,27 @@ export interface LeaderboardEntry {
   points: number;
   avatar?: string;
 }
+
+// Staking types
+export interface StakingTask {
+  taskId: string;
+  streamer: string;
+  stakedAmount: string;
+  startTime: number;
+  endTime: number;
+  duration: number;
+  rewardRate: number;
+  totalViewers: number;
+  totalPoints: number;
+  streamerReward: string;
+  status: 'Active' | 'Ended' | 'Claimed' | 'Unstaked';
+  unstakeTime: number;
+}
+
+export interface ViewerRewardAccount {
+  totalPoints: number;
+  claimedPoints: number;
+  pendingPoints: number;
+  totalClaimed: string;
+  lastClaimTime: number;
+}

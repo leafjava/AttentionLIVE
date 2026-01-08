@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader } from '@heroui/card';
 import { Button } from '@heroui/button';
 import { Input } from '@heroui/input';
@@ -18,6 +18,167 @@ import AttentionTokenABI from '@/lib/abi/AttentionToken.json';
 import StreamerStakingPoolABI from '@/lib/abi/StreamerStakingPool.json';
 import ViewerRewardPoolABI from '@/lib/abi/ViewerRewardPool.json';
 
+// Task status enum matching contract
+const TaskStatus = {
+  0: 'Active',
+  1: 'Ended',
+  2: 'Claimed',
+  3: 'Unstaked'
+};
+
+// TaskCard component to display individual task
+function TaskCard({ 
+  taskId, 
+  onEndTask, 
+  onClaimReward, 
+  onUnstake,
+  isEnding,
+  isClaiming,
+  isUnstaking
+}: { 
+  taskId: number;
+  onEndTask: (id: number) => void;
+  onClaimReward: (id: number) => void;
+  onUnstake: (id: number) => void;
+  isEnding: boolean;
+  isClaiming: boolean;
+  isUnstaking: boolean;
+}) {
+  const { data: task } = useReadContract({
+    address: STREAMER_STAKING_POOL_ADDRESS,
+    abi: StreamerStakingPoolABI,
+    functionName: 'tasks',
+    args: [BigInt(taskId)],
+  });
+
+  if (!task || !Array.isArray(task)) {
+    return (
+      <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+        <p className="text-gray-500">Loading task #{taskId}...</p>
+      </div>
+    );
+  }
+
+  const [streamer, stakedAmount, startTime, endTime, duration, rewardRate, totalViewers, totalPoints, streamerReward, status, unstakeTime] = task;
+  const statusText = TaskStatus[Number(status) as keyof typeof TaskStatus] || 'Unknown';
+  const now = Math.floor(Date.now() / 1000);
+  const canEnd = now >= Number(endTime) && Number(status) === 0;
+  const canClaim = Number(status) === 1;
+  const canUnstake = Number(status) === 2 && Number(unstakeTime) > 0 && now >= Number(unstakeTime);
+
+  return (
+    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h4 className="text-lg font-bold">Task #{taskId}</h4>
+          <Chip 
+            color={
+              Number(status) === 0 ? 'success' : 
+              Number(status) === 1 ? 'warning' : 
+              Number(status) === 2 ? 'primary' : 
+              'default'
+            }
+            size="sm"
+            className="mt-1"
+          >
+            {statusText}
+          </Chip>
+        </div>
+        <div className="text-right">
+          <p className="text-sm text-gray-600">Staked Amount</p>
+          <p className="text-xl font-bold">{formatEther(stakedAmount)} ATT</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <p className="text-sm text-gray-600">Start Time</p>
+          <p className="text-sm font-medium">{new Date(Number(startTime) * 1000).toLocaleString()}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">End Time</p>
+          <p className="text-sm font-medium">{new Date(Number(endTime) * 1000).toLocaleString()}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">Duration</p>
+          <p className="text-sm font-medium">{Number(duration) / 60} minutes</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">Reward Rate</p>
+          <p className="text-sm font-medium">{Number(rewardRate) / 100}%</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">Total Viewers</p>
+          <p className="text-sm font-medium">{Number(totalViewers)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">Total Points</p>
+          <p className="text-sm font-medium">{Number(totalPoints)}</p>
+        </div>
+      </div>
+
+      {Number(streamerReward) > 0 && (
+        <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg mb-4">
+          <p className="text-sm text-gray-600">Streamer Reward</p>
+          <p className="text-lg font-bold text-green-600">{formatEther(streamerReward)} ATT</p>
+        </div>
+      )}
+
+      {Number(status) === 2 && Number(unstakeTime) > 0 && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg mb-4">
+          <p className="text-sm text-gray-600">Unstake Available</p>
+          <p className="text-sm font-medium">
+            {now >= Number(unstakeTime) 
+              ? 'Now' 
+              : new Date(Number(unstakeTime) * 1000).toLocaleString()}
+          </p>
+        </div>
+      )}
+
+      <div className="flex gap-2 flex-wrap">
+        {canEnd && (
+          <Button
+            color="warning"
+            size="sm"
+            onPress={() => onEndTask(taskId)}
+            isLoading={isEnding}
+            isDisabled={isEnding}
+          >
+            End Task
+          </Button>
+        )}
+        {canClaim && (
+          <Button
+            color="success"
+            size="sm"
+            onPress={() => onClaimReward(taskId)}
+            isLoading={isClaiming}
+            isDisabled={isClaiming}
+          >
+            Claim Reward
+          </Button>
+        )}
+        {canUnstake && (
+          <Button
+            color="primary"
+            size="sm"
+            onPress={() => onUnstake(taskId)}
+            isLoading={isUnstaking}
+            isDisabled={isUnstaking}
+          >
+            Unstake
+          </Button>
+        )}
+        {Number(status) === 0 && !canEnd && (
+          <p className="text-sm text-gray-500 flex items-center">
+            Task ends in {Math.max(0, Math.floor((Number(endTime) - now) / 60))} minutes
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function StakingPage() {
   const { address, isConnected } = useAccount();
   const [activeTab, setActiveTab] = useState('streamer');
@@ -26,6 +187,14 @@ export default function StakingPage() {
   const [stakeAmount, setStakeAmount] = useState('');
   const [duration, setDuration] = useState('3600'); // 1 hour default
   const [rewardRate, setRewardRate] = useState('500'); // 5% default
+
+  // Read streamer's task IDs
+  const { data: taskIds, refetch: refetchTaskIds } = useReadContract({
+    address: STREAMER_STAKING_POOL_ADDRESS,
+    abi: StreamerStakingPoolABI,
+    functionName: 'getStreamerTasks',
+    args: address ? [address] : undefined,
+  });
 
   // Read ATT balance
   const { data: attBalance } = useReadContract({
@@ -54,12 +223,25 @@ export default function StakingPage() {
   // Write contracts
   const { writeContract: approveToken, data: approveHash } = useWriteContract();
   const { writeContract: createTask, data: createTaskHash } = useWriteContract();
+  const { writeContract: endTask, data: endTaskHash } = useWriteContract();
+  const { writeContract: claimStreamerReward, data: claimStreamerHash } = useWriteContract();
+  const { writeContract: unstakeTokens, data: unstakeHash } = useWriteContract();
   const { writeContract: claimReward, data: claimHash } = useWriteContract();
 
   // Wait for transactions
-  const { isLoading: isApproving } = useWaitForTransactionReceipt({ hash: approveHash });
-  const { isLoading: isCreating } = useWaitForTransactionReceipt({ hash: createTaskHash });
+  const { isLoading: isApproving, isSuccess: approveSuccess } = useWaitForTransactionReceipt({ hash: approveHash });
+  const { isLoading: isCreating, isSuccess: createSuccess } = useWaitForTransactionReceipt({ hash: createTaskHash });
+  const { isLoading: isEnding } = useWaitForTransactionReceipt({ hash: endTaskHash });
+  const { isLoading: isClaimingStreamer } = useWaitForTransactionReceipt({ hash: claimStreamerHash });
+  const { isLoading: isUnstaking } = useWaitForTransactionReceipt({ hash: unstakeHash });
   const { isLoading: isClaiming } = useWaitForTransactionReceipt({ hash: claimHash });
+
+  // Refetch task list when task is created
+  useEffect(() => {
+    if (createSuccess) {
+      refetchTaskIds();
+    }
+  }, [createSuccess, refetchTaskIds]);
 
   const handleApprove = async () => {
     if (!stakeAmount) return;
@@ -80,6 +262,33 @@ export default function StakingPage() {
       abi: StreamerStakingPoolABI,
       functionName: 'createStreamingTask',
       args: [parseEther(stakeAmount), BigInt(duration), BigInt(rewardRate)],
+    });
+  };
+
+  const handleEndTask = async (taskId: number) => {
+    endTask({
+      address: STREAMER_STAKING_POOL_ADDRESS,
+      abi: StreamerStakingPoolABI,
+      functionName: 'endStreamingTask',
+      args: [BigInt(taskId)],
+    });
+  };
+
+  const handleClaimStreamerReward = async (taskId: number) => {
+    claimStreamerReward({
+      address: STREAMER_STAKING_POOL_ADDRESS,
+      abi: StreamerStakingPoolABI,
+      functionName: 'claimStreamerReward',
+      args: [BigInt(taskId)],
+    });
+  };
+
+  const handleUnstake = async (taskId: number) => {
+    unstakeTokens({
+      address: STREAMER_STAKING_POOL_ADDRESS,
+      abi: StreamerStakingPoolABI,
+      functionName: 'unstake',
+      args: [BigInt(taskId)],
     });
   };
 
@@ -134,6 +343,29 @@ export default function StakingPage() {
         className="mb-6"
       >
         <Tab key="streamer" title="Streamer Staking">
+          {/* My Tasks Section */}
+          {taskIds && Array.isArray(taskIds) && taskIds.length > 0 ? (
+            <Card className="mb-6">
+              <CardHeader>
+                <h3 className="text-xl font-bold">My Tasks</h3>
+              </CardHeader>
+              <CardBody className="space-y-4">
+                {taskIds.map((taskId: bigint) => (
+                  <TaskCard 
+                    key={taskId.toString()} 
+                    taskId={Number(taskId)}
+                    onEndTask={handleEndTask}
+                    onClaimReward={handleClaimStreamerReward}
+                    onUnstake={handleUnstake}
+                    isEnding={isEnding}
+                    isClaiming={isClaimingStreamer}
+                    isUnstaking={isUnstaking}
+                  />
+                ))}
+              </CardBody>
+            </Card>
+          ) : null}
+
           <Card>
             <CardHeader>
               <h3 className="text-xl font-bold">Create Streaming Task</h3>

@@ -1,7 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Button, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Card, CardBody, CardHeader } from '@heroui/card';
+import { Button } from '@heroui/button';
+import { Chip } from '@heroui/chip';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/table';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { formatEther } from 'viem';
 import { STREAMER_STAKING_POOL_ADDRESS } from '@/lib/contracts/staking';

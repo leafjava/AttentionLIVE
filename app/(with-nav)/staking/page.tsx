@@ -216,13 +216,13 @@ export default function StakingPage() {
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                   <p className="text-sm text-gray-600 mb-1">Total Points</p>
                   <p className="text-2xl font-bold">
-                    {viewerAccount ? Number(viewerAccount[0]) : 0}
+                    {viewerAccount && Array.isArray(viewerAccount) ? Number(viewerAccount[0]) : 0}
                   </p>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                   <p className="text-sm text-gray-600 mb-1">Pending Points</p>
                   <p className="text-2xl font-bold">
-                    {viewerAccount ? Number(viewerAccount[2]) : 0}
+                    {viewerAccount && Array.isArray(viewerAccount) ? Number(viewerAccount[2]) : 0}
                   </p>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
@@ -234,7 +234,9 @@ export default function StakingPage() {
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                   <p className="text-sm text-gray-600 mb-1">Total Claimed</p>
                   <p className="text-2xl font-bold">
-                    {viewerAccount ? formatEther(viewerAccount[3] as bigint) : '0'}
+                    {viewerAccount && Array.isArray(viewerAccount) && viewerAccount[3] 
+                      ? formatEther(viewerAccount[3] as bigint) 
+                      : '0'}
                   </p>
                 </div>
               </div>

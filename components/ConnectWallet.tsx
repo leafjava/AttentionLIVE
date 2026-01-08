@@ -48,14 +48,38 @@ export default function ConnectWallet() {
     console.log('🔗 开始钱包连接');
     console.log('📋 可用连接器:', connectors);
     
-    if (typeof window !== 'undefined' && !window.ethereum) {
-      alert('未检测到 MetaMask 或 OKX 钱包');
-      return;
-    }
-    
     try {
+      // 检测可用的钱包
+      if (typeof window === 'undefined') {
+        alert('请在浏览器环境中使用');
+        return;
+      }
+
+      // 处理多钱包冲突：优先使用 MetaMask
+      let provider = window.ethereum;
+      
+      if (window.ethereum?.providers?.length) {
+        // 多个钱包扩展存在
+        console.log('🔍 检测到多个钱包:', window.ethereum.providers.length);
+        
+        // 尝试找到 MetaMask
+        const metamaskProvider = window.ethereum.providers.find(
+          (p: any) => p.isMetaMask && !p.isOkxWallet
+        );
+        
+        if (metamaskProvider) {
+          provider = metamaskProvider;
+          console.log('✅ 使用 MetaMask');
+        } else {
+          console.log('⚠️ 未找到 MetaMask，使用默认钱包');
+        }
+      } else if (!window.ethereum) {
+        alert('未检测到钱包扩展，请安装 MetaMask 或 OKX 钱包');
+        return;
+      }
+      
       // 获取当前链 ID（用于调试）
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      const chainId = await provider.request({ method: 'eth_chainId' });
       const currentChainId = parseInt(chainId, 16);
       console.log('🔗 当前链 ID:', currentChainId, '(31337=localhost, 97=BSC Testnet)');
       
